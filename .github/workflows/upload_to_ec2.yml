@@ -16,24 +16,19 @@ jobs:
     - name: Set up SSH Key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+        echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' | ssh-add -
         chmod 600 ~/.ssh/ec2_key
-        cat ~/.ssh/ec2_key
+        touch ~/.ssh/config
+        touch ~/.ssh/known_hosts
+        chmod -R 400 ~/.ssh
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
     - name: Pull Docker Image and Run on EC2
       shell: bash
       run: |
-        if [ -f ~/.ssh/ec2_key ]; then
-          echo "SSH key exists."
-          ls -l ~/.ssh/ec2_key
-        else
-          echo "SSH key does not exist."
-          exit 1
-        fi
         ssh -v -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Ensure correct permissions for SSH directories and files
-          sudo chmod 700 /root/.ssh
-          sudo chmod 600 /root/.ssh/authorized_keys
 
           # Update package list
           sudo apt-get update
@@ -53,5 +48,4 @@ jobs:
           docker pull talalbadreddine/sales_etl:${{ github.sha }}
 
           # Run the Docker container
-          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
-        EOF
+          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${
