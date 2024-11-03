@@ -66,4 +66,3 @@ jobs:
           # Pull and start new containers
           sudo docker-compose pull
           sudo docker-compose up -d
-EOF
