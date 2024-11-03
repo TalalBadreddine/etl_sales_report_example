@@ -43,4 +43,3 @@ jobs:
 
           # Run the Docker container
           docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
-EOF
