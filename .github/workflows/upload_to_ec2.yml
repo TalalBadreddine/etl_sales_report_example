@@ -31,7 +31,11 @@ jobs:
     - name: Deploy with Docker Compose
       run: |
         scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
-        scp -i ~/.ssh/ec2_key init.sql ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/init.sql
+        ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          mkdir -p ~/deployment
+          chmod 755 ~/deployment
+        EOF
+        scp -i ~/.ssh/ec2_key init.sql ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/deployment/init.sql
         ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           sudo yum update -y
           if ! command -v docker &> /dev/null; then
@@ -43,7 +47,7 @@ jobs:
               sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
           fi
-          cd ~
+          cd ~/deployment
 
           sudo docker ps -q | xargs -r sudo docker stop
           sudo docker ps -aq | xargs -r sudo docker rm
