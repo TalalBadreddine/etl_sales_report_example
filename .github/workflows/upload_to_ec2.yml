@@ -12,14 +12,16 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
-
     - name: Set up SSH Key
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
         chmod 600 ~/.ssh/ec2_key
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/ec2_key
+        eval "$(ssh-agent -s)"  # Start the SSH agent
+        ssh-add ~/.ssh/ec2_key  # Add the SSH key to the agent
+
+    - name: List SSH Keys
+      run: ssh-add -l
 
     - name: Pull Docker Image and Run on EC2
       shell: bash
