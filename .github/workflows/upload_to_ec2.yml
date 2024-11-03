@@ -13,10 +13,12 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
 
-    - name: Start SSH Agent
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+    - name: Set up SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+        chmod 600 ~/.ssh/ec2_key
+        cat ~/.ssh/ec2_key
 
     - name: Pull Docker Image and Run on EC2
       shell: bash
