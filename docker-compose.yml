@@ -13,7 +13,6 @@
          - .env
        depends_on:
          - db
-       # Optional: Use healthcheck to wait for db readiness
        healthcheck:
          test: ["CMD-SHELL", "curl -f http://db:5432 || exit 1"]
          interval: 10s
