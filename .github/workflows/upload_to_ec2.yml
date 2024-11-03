@@ -31,8 +31,8 @@ jobs:
 
     - name: Copy Docker Compose files
       run: |
-        scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
-        scp -i ~/.ssh/ec2_key init.sql ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
+        scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:./
+        scp -i ~/.ssh/ec2_key init.sql ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:./
 
     - name: Deploy to EC2
       env:
