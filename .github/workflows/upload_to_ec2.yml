@@ -33,7 +33,7 @@ jobs:
     - name: Pull Docker Image and Run on EC2
       shell: bash
       run: |
-        ssh -v -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Ensure correct permissions for SSH directories and files
 
           # Update package list
