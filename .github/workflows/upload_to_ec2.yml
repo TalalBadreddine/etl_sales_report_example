@@ -33,6 +33,7 @@ jobs:
         scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
         ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           sudo yum update -y
+          sudo dnf install libxcrypt-compat
           if ! command -v docker &> /dev/null; then
               sudo yum install -y docker
               sudo service docker start
