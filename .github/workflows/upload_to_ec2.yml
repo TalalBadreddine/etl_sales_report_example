@@ -42,29 +42,25 @@ jobs:
         ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd ~/deployment
 
-          # Install Docker if needed
           if ! command -v docker &> /dev/null; then
               sudo yum install -y docker
               sudo service docker start
               sudo usermod -a -G docker ${{ secrets.EC2_USER }}
           fi
 
-          # Install docker-compose if needed
           if ! command -v docker-compose &> /dev/null; then
               sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
           fi
 
-          # Export environment variables
           echo IMAGE_TAG=${{ github.sha }} > .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
           echo DB_USER=${{ secrets.DB_USER }} >> .env
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
 
-          # Stop and remove existing containers
           sudo docker ps -q | xargs -r sudo docker stop
           sudo docker ps -aq | xargs -r sudo docker rm
 
-          # Pull and start new containers
           sudo docker-compose pull
           sudo docker-compose up -d
+        EOF
