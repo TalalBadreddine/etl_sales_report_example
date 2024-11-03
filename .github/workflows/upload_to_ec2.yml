@@ -15,14 +15,15 @@ jobs:
 
     - name: Set up SSH Key
       run: |
-        echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/ec2_key_rsa
-        chmod 400 /tmp/ec2_key_rsa
-        eval "$(ssh-agent -s)"  # Start the SSH agent
-        echo "${{ secrets.EC2_SSH_PASSPHRASE }}" | ssh-add /tmp/ec2_key_rsa  # Add the SSH key to the agent using the passphrase
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+        chmod 600 ~/.ssh/ec2_key
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/ec2_key
 
     - name: Pull Docker Image and Run on EC2
       run: |
-        ssh -vvv -tt -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} bash << 'EOF'
+        ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Update package list
           sudo apt-get update
 
@@ -42,4 +43,4 @@ jobs:
 
           # Run the Docker container
           docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
-        EOF
+EOF
