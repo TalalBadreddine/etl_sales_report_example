@@ -20,10 +20,10 @@ jobs:
 
     - name: Pull Docker Image and Run on EC2
       run: |
-          ssh -tt -o StrictHostKeyChecking=no -i /tmp/ec2_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -tt -o StrictHostKeyChecking=no -i /tmp/ec2_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Update package list
           sudo apt-get update
-          
+
           # Check for Docker installation, and install if not found
           if ! command -v docker &> /dev/null; then
               sudo apt-get install -y docker.io
@@ -37,7 +37,7 @@ jobs:
 
           # Pull the Docker image from Docker Hub using the commit SHA as the tag
           docker pull talalbadreddine/sales_etl:${{ github.sha }}
-  
+
           # Run the Docker container
           docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
         EOF
