@@ -31,6 +31,7 @@ jobs:
     - name: Deploy with Docker Compose
       run: |
         scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
+        scp -i ~/.ssh/ec2_key init.sql ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/init.sql
         ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           sudo yum update -y
           if ! command -v docker &> /dev/null; then
@@ -43,6 +44,10 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
           fi
           cd ~
+
+          sudo docker ps -q | xargs -r sudo docker stop
+          sudo docker ps -aq | xargs -r sudo docker rm
+
           export IMAGE_TAG=${{ github.sha }}
           docker-compose pull
           docker-compose up -d
