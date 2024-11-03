@@ -1,0 +1,43 @@
+name: Pull and Run Docker Image on EC2
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH Key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/ec2_key
+        chmod 600 /tmp/ec2_key
+
+    - name: Pull Docker Image and Run on EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i /tmp/ec2_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          # Update package list
+          sudo apt-get update
+          
+          # Check for Docker installation, and install if not found
+          if ! command -v docker &> /dev/null; then
+              sudo apt-get install -y docker.io
+          fi
+
+          # Stop and remove existing container if it exists
+          if [ "$(docker ps -q -f name=sales_etl_container)" ]; then
+              docker stop sales_etl_container
+              docker rm sales_etl_container
+          fi
+
+          # Pull the Docker image from Docker Hub using the commit SHA as the tag
+          docker pull talalbadreddine/sales_etl:${{ github.sha }}
+  
+          # Run the Docker container
+          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
+        EOF
