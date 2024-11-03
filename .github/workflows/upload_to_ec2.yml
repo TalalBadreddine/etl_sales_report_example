@@ -1,4 +1,4 @@
-name: Pull and Run Docker Image on EC2
+name: Deploy Docker Compose Application
 
 on:
   workflow_run:
@@ -24,35 +24,25 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
         chmod 600 ~/.ssh/ec2_key
-        eval "$(ssh-agent -s)"  # Start the SSH agent
-        ssh-add ~/.ssh/ec2_key  # Add the SSH key to the agent
-        touch ~/.ssh/config
-        touch ~/.ssh/known_hosts
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/ec2_key
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-        echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - name: Pull Docker Image and Run on EC2
-      shell: bash
-      run: |
-        ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          # Update package list
-          sudo yum update -y
 
-          # Check for Docker installation, and install if not found
+    - name: Deploy with Docker Compose
+      run: |
+        scp -i ~/.ssh/ec2_key docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
+        ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          sudo yum update -y
           if ! command -v docker &> /dev/null; then
               sudo yum install -y docker
               sudo service docker start
               sudo usermod -a -G docker ec2-user
           fi
-
-          # Stop and remove existing container if it exists
-          if [ "$(sudo docker ps -q -f name=sales_etl_container)" ]; then
-              sudo docker stop sales_etl_container
-              sudo docker rm sales_etl_container
+          if ! command -v docker-compose &> /dev/null; then
+              sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
           fi
-
-          # Pull the Docker image from Docker Hub using the commit SHA as the tag
-          sudo docker pull talalbadreddine/sales_etl:${{ github.sha }}
-
-          # Run the Docker container
-          sudo docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
+          cd ~
+          docker-compose pull
+          docker-compose up -d
         EOF
