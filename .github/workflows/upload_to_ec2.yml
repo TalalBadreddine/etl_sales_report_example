@@ -16,9 +16,10 @@ jobs:
     - name: Set up SSH Key
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/ec2_key_rsa
+        echo "${{ secrets.EC2_SSH_PASSPHRASE }}" > /tmp/passphrase.txt
         chmod 400 /tmp/ec2_key_rsa
         eval "$(ssh-agent -s)"  # Start the SSH agent
-        ssh-add /tmp/ec2_key_rsa  # Add the SSH key to the agent
+        ssh-add - <<< "${{ secrets.EC2_SSH_PASSPHRASE }}" /tmp/ec2_key_rsa  # Add the SSH key to the agent using the passphrase
 
     - name: Pull Docker Image and Run on EC2
       run: |
