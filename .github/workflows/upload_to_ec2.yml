@@ -21,9 +21,6 @@ jobs:
         eval "$(ssh-agent -s)"
         ssh-add ~/.ssh/ec2_key
 
-    - name: List SSH Keys
-      run: ssh-add -l
-
     - name: Pull Docker Image and Run on EC2
       shell: bash
       run: |
