@@ -24,6 +24,13 @@ jobs:
     - name: Pull Docker Image and Run on EC2
       shell: bash
       run: |
+        if [ -f ~/.ssh/ec2_key ]; then
+          echo "SSH key exists."
+          ls -l ~/.ssh/ec2_key
+        else
+          echo "SSH key does not exist."
+          exit 1
+        fi
         ssh -v -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Update package list
           sudo apt-get update
