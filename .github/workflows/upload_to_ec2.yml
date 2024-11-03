@@ -21,11 +21,12 @@ jobs:
     - name: Set up SSH Key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' | ssh-add -
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
         chmod 600 ~/.ssh/ec2_key
+        eval "$(ssh-agent -s)"  # Start the SSH agent
+        ssh-add ~/.ssh/ec2_key  # Add the SSH key to the agent
         touch ~/.ssh/config
         touch ~/.ssh/known_hosts
-        chmod -R 400 ~/.ssh
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
         echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
@@ -53,4 +54,5 @@ jobs:
           docker pull talalbadreddine/sales_etl:${{ github.sha }}
 
           # Run the Docker container
-          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${
+          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
+        EOF
