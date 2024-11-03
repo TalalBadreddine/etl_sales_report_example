@@ -56,6 +56,7 @@ jobs:
 
           # Export environment variables
           export IMAGE_TAG=${{ github.sha }}
+          export DB_NAME=${{ secrets.DB_NAME }}
           export DB_USER=${{ secrets.DB_USER }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
