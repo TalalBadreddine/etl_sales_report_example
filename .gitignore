@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django-related files
+db.sqlite3
+*.sqlite3
+*.log
+
+# Local development environment settings
+.env
+.vscode/
+.idea/
+
+# Ignore migrations (optional: if you want to keep migrations, remove this line)
+**/migrations/**
+
+# Ignore media and static files (optional: if generated files are served from storage like S3)
+media/
+staticfiles/
+static/
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.tox/
+.cache
+
+# Python packaging
+*.egg-info/
+*.eggs
+*.egg
+
+# pipenv and virtualenv
+Pipfile
+Pipfile.lock
+env/
+venv/
+ENV/
+venv.bak/
+
+# Pytest
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Celery beat schedule file
+celerybeat-schedule
+
+# mypy
+.mypy_cache/
+
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+
+# IDEs and editors
+*.swp
+*~
+*.sublime-workspace
+*.sublime-project
+
+# Mac OS
+.DS_Store

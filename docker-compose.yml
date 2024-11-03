@@ -1,0 +1,40 @@
+   version: '3.8'
+
+   services:
+     web:
+       build: .
+       container_name: my-app
+       command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+       volumes:
+         - .:/app
+       ports:
+         - "3000:8000"
+       env_file:
+         - .env
+       depends_on:
+         - db
+       # Optional: Use healthcheck to wait for db readiness
+       healthcheck:
+         test: ["CMD-SHELL", "curl -f http://db:5432 || exit 1"]
+         interval: 10s
+         retries: 5
+
+     db:
+       image: postgres
+       container_name: my-postgres
+       environment:
+         POSTGRES_DB: ${DB_NAME}
+         POSTGRES_USER: ${DB_USER}
+         POSTGRES_PASSWORD: ${DB_PASSWORD}
+       ports:
+         - "5432:5432"
+       volumes:
+         - postgres_data:/var/lib/postgresql/data
+         - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+       healthcheck:
+         test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+         interval: 10s
+         retries: 5
+
+   volumes:
+     postgres_data:

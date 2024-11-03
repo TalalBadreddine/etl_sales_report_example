@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .error-code {
+            color: #e74c3c;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .available-paths {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .path-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .path-url {
+            color: #2980b9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="error-code">404 - Page Not Found</h1>
+    <p>The path you're looking for doesn't exist. Here are the available paths:</p>
+
+    <div class="available-paths">
+        {% for path in available_paths %}
+        <div class="path-item">
+            <div class="path-url">{{ path.url }}</div>
+            <div class="path-description">{{ path.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
