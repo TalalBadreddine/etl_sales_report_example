@@ -56,9 +56,9 @@ jobs:
 
           # Export environment variables
           echo \"IMAGE_TAG=${{ github.sha }}\" > .env
-          export DB_NAME=${{ secrets.DB_NAME }}
-          export DB_USER=${{ secrets.DB_USER }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          echo \"DB_NAME=${{ secrets.DB_NAME }}\" >> .env
+          echo \"DB_USER=${{ secrets.DB_USER }}\" >> .env
+          echo \"DB_PASSWORD=${{ secrets.DB_PASSWORD }}\" >> .env
 
           # Stop and remove existing containers
           sudo docker ps -q | xargs -r sudo docker stop
