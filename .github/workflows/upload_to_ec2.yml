@@ -29,30 +29,29 @@ jobs:
         touch ~/.ssh/known_hosts
         ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
         echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-
     - name: Pull Docker Image and Run on EC2
       shell: bash
       run: |
         ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          # Ensure correct permissions for SSH directories and files
-
           # Update package list
-          apt update
+          sudo yum update -y
 
           # Check for Docker installation, and install if not found
           if ! command -v docker &> /dev/null; then
-              apt install -y docker.io
+              sudo yum install -y docker
+              sudo service docker start
+              sudo usermod -a -G docker ec2-user
           fi
 
           # Stop and remove existing container if it exists
-          if [ "$(docker ps -q -f name=sales_etl_container)" ]; then
-              docker stop sales_etl_container
-              docker rm sales_etl_container
+          if [ "$(sudo docker ps -q -f name=sales_etl_container)" ]; then
+              sudo docker stop sales_etl_container
+              sudo docker rm sales_etl_container
           fi
 
           # Pull the Docker image from Docker Hub using the commit SHA as the tag
-          docker pull talalbadreddine/sales_etl:${{ github.sha }}
+          sudo docker pull talalbadreddine/sales_etl:${{ github.sha }}
 
           # Run the Docker container
-          docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
+          sudo docker run -d --name sales_etl_container talalbadreddine/sales_etl:${{ github.sha }}
         EOF
