@@ -13,9 +13,6 @@ db.sqlite3
 .vscode/
 .idea/
 
-# Ignore migrations (optional: if you want to keep migrations, remove this line)
-**/migrations/**
-
 # Ignore media and static files (optional: if generated files are served from storage like S3)
 media/
 staticfiles/
