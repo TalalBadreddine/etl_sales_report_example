@@ -53,6 +53,16 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
           fi
 
+          # Mount the EBS volume
+          if ! mountpoint -q /mnt/ebs; then
+              sudo mkdir -p /mnt/ebs
+              sudo mount /dev/sdb /mnt/ebs
+          fi
+
+          # Ensure the directory for PostgreSQL data exists
+          sudo mkdir -p /mnt/ebs/postgres_data
+          sudo chown -R 1000:1000 /mnt/ebs/postgres_data
+
           echo IMAGE_TAG=${{ github.sha }} > .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
           echo DB_USER=${{ secrets.DB_USER }} >> .env
