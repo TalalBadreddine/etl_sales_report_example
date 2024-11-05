@@ -21,5 +21,5 @@ EXPOSE 8000
 # Define environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Run the application with wait-for-it.sh
-CMD ["sh", "-c", "./wait-for-it.sh db 5432 -- python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# Run the application
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
