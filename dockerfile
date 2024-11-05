@@ -4,15 +4,10 @@ FROM python:3.13-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install netcat for the wait-for-it.sh script
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Copy and set permissions for wait-for-it.sh
-COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
